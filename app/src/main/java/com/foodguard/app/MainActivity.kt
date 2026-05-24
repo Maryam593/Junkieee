@@ -92,6 +92,23 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
 
+        // ── Reset All ────────────────────────────────────────────────────
+        findViewById<MaterialButton>(R.id.btnResetAll).setOnClickListener {
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Sab Reset Karo?")
+                .setMessage("Budget, period, aur sab kharch data delete ho jaayega. Pakka?")
+                .setPositiveButton("Haan, Reset") { _, _ ->
+                    budget.resetAll()
+                    startCal.timeInMillis = System.currentTimeMillis()
+                    endCal.timeInMillis = System.currentTimeMillis()
+                    updateDateDisplays()
+                    updateUI()
+                    Toast.makeText(this, "Sab saaf! Fresh start.", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Nahi", null)
+                .show()
+        }
+
         // ── Budget Period Date Pickers ───────────────────────────────────
         findViewById<TextView>(R.id.tvStartDate).setOnClickListener {
             DatePickerDialog(this, { _, y, m, d ->

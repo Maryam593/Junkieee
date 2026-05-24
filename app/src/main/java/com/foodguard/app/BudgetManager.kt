@@ -56,6 +56,10 @@ class BudgetManager(private val context: Context) {
         spentAmount += amount
     }
 
+    fun resetAll() {
+        prefs.edit().clear().apply()
+    }
+
     // Set new period — spending resets, needs re-initialization
     fun setPeriod(startMs: Long, endMs: Long) {
         prefs.edit()

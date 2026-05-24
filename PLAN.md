@@ -156,10 +156,68 @@ FoodGuard/
 
 ---
 
-## Pending / Ideas
+## Completed (Latest Session) ✅
 
-- [ ] Emergency unlock / budget badhao button
+### 13. Scroll Debounce Fix
+- Pehle gestureSwipeUp har event pe fire hoti thi (dozens/sec) → same 3 orders bar bar scan hote the
+- Fix: 2-second cooldown on gestureSwipeUp + scrollRunnable (every 2.5s) exclusively handles scrolling
+- scanOrderHistory se performAutoScroll hata diya — sirf scrollRunnable scroll karta hai
+- scrollRunnable mein Orders screen detection fix: "Delivered on" + "Rs." pattern use karta hai
+
+---
+
+## Pending Cases to Implement
+
+### CASE A — Budget Shuru Nahi Hua (Not Set / Period Not Set)
+**Scenario:** User ne budget ya period set nahi kiya aur FoodPanda khol liya.
+**Current behavior:** Green dot dikhta hai (0/0 = looks fine), koi warning nahi.
+**What should happen:**
+- FoodPanda kholte hi ek gentle overlay/banner: "Budget set nahi! Junkie mein jao aur budget set karo pehle."
+- Dot grey/hollow dikhaye (not green — green means "all good" jo misleading hai)
+- Maybe MainActivity pe wapis le jaye ya sirf info dikhaye
+
+### CASE B — Budget Khatam Honay Wala Hai (Almost Over, ~20% Remaining)
+**Scenario:** User ke paas sirf 20% ya less budget bacha hai, woh order karne wala hai.
+**Current behavior:** Dot yellow ho jata hai — that's it, koi message nahi.
+**What should happen:**
+- Jab user checkout screen pe jaye (ya order amount detect ho), ek warning overlay:
+  "⚠ Sirf Rs. X bacha hai! Sochke order karo."
+- Agar woh phir bhi order karay, theek hai — sirf warning, block nahi
+- Warning dismiss hone ke baad order proceed karne do (unlike budget-over jo block karta hai)
+
+### CASE C — Already Discussed: Budget KHATAM (Over)
+**Current behavior:** Block karta hai, daddy joke dikhata hai, home bhej deta hai. ✅ Working.
+
+---
+
+## Background Scan — Options
+
+### Option A — Auto-Launch + Navigate + Scan + Home (Recommended)
+- User "Scan Karo" dabata hai Junkie mein
+- App programmatically FoodPanda launch karta hai (startActivity Intent)
+- Service auto-navigates: Home → Account tab → Orders
+- ~20-30 second scan — FoodPanda screen briefly flash hoti hai
+- Scan khatam → GLOBAL_ACTION_HOME → user wapis home pe
+- **Pro:** Koi user interaction nahi chahiye
+- **Con:** FoodPanda ~20-30 sec ke liye visible hoga
+
+### Option B — FoodPanda API Direct (Truly Invisible)
+- FoodPanda ke network requests reverse-engineer karo
+- Authentication token pakdo, phir orders API directly call karo
+- No screen needed at all — pure background HTTP calls
+- **Pro:** Completely invisible, instant
+- **Con:** Complex, FoodPanda updates se toot sakta hai, login handling mushkil
+
+**Decision:** Option A implement karo — practical aur doable. Option B future exploration.
+
+---
+
+## Pending / Ideas (Backlog)
+
+- [ ] **Case A:** Budget/period not set warning when FoodPanda opens
+- [ ] **Case B:** Almost-over warning overlay at checkout (non-blocking)
+- [ ] **Background scan Option A:** Auto-launch FoodPanda, scan, press Home
+- [ ] Emergency unlock / budget temporarily increase karo
 - [ ] Spending history screen (kitna kharch kab hua)
-- [ ] Notification jab budget 20% bacha ho
-- [ ] Signed release APK banao (Play Store ke liye)
+- [ ] Signed release APK (Play Store ke liye)
 - [ ] Better date detection if FoodPanda changes format

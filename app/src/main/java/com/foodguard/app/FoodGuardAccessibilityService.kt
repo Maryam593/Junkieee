@@ -49,6 +49,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     private var pendingOrderAmount = 0f
     private var waitingForConfirmation = false
     private var lastScanTime = 0L
+    private var lastSwipeTime = 0L
 
     // Marquee banner shown during scan
     private var scanMarqueeView: TextView? = null
@@ -75,25 +76,25 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         }
     }
 
-    // Periodic scroll — fires every 2s during scan even if events stop
+    // Periodic scroll — fires every 2.5s during scan even if events stop
     private val scrollRunnable = object : Runnable {
         override fun run() {
             if (!isScanMode) return
             val root = rootInActiveWindow ?: run {
-                handler.postDelayed(this, 2000)
+                handler.postDelayed(this, 2500)
                 return
             }
             val allText = extractAllText(root)
-            val onOrdersScreen = allText.contains("my orders", ignoreCase = true) ||
-                    allText.contains("past orders", ignoreCase = true) ||
-                    allText.contains("order history", ignoreCase = true)
+            val onOrdersScreen = allText.contains("past orders", ignoreCase = true) ||
+                    allText.contains("order history", ignoreCase = true) ||
+                    (allText.contains("delivered on", ignoreCase = true) && allText.contains("Rs.", ignoreCase = true))
             if (onOrdersScreen) {
-                performAutoScroll(root)
+                gestureSwipeUp()
             } else if (isAutoScan && !navigationAttempted) {
                 navigationAttempted = true
                 tryNavigateToOrders(root)
             }
-            handler.postDelayed(this, 2000)
+            handler.postDelayed(this, 2500)
         }
     }
 
@@ -426,13 +427,16 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     }
 
     private fun gestureSwipeUp() {
+        val now = System.currentTimeMillis()
+        if (now - lastSwipeTime < 2000L) return
+        lastSwipeTime = now
         val m = resources.displayMetrics
         val cx = m.widthPixels / 2f
         val path = Path().apply {
             moveTo(cx, m.heightPixels * 0.75f)
             lineTo(cx, m.heightPixels * 0.25f)
         }
-        val stroke = GestureDescription.StrokeDescription(path, 0, 350)
+        val stroke = GestureDescription.StrokeDescription(path, 0, 400)
         dispatchGesture(GestureDescription.Builder().addStroke(stroke).build(), null, null)
         Log.d(TAG, "gestureSwipeUp performed")
     }
@@ -517,11 +521,8 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             if (noNewItemsCount >= 6 && isScanMode) {
                 noNewItemsCount = 0
                 handler.postDelayed({ if (isScanMode) finishScan() }, 800)
-                return
             }
         }
-
-        performAutoScroll(root)
     }
 
     private fun extractOrdersWithDates(allText: String): List<Pair<Float, Long>> {
@@ -619,10 +620,6 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         }
         seenOrderKeys.clear()
         scanTotal = 0f
-    }
-
-    private fun performAutoScroll(root: AccessibilityNodeInfo) {
-        gestureSwipeUp()
     }
 
     // ─── Scan Marquee Banner ──────────────────────────────────────────

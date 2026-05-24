@@ -308,15 +308,43 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     // Account tab click karo, phir 2s baad My Orders click karo
     private fun tryNavigateToOrders(root: AccessibilityNodeInfo) {
         navigationAttempted = true
-        // Account tab click karo (bottom nav)
-        val wentToAccount = findAndClickNode(root, listOf("account", "profile", "my account", "me", "akun"))
-        Log.d(TAG, "navigateToOrders: account tab click=$wentToAccount")
-        // Phir Orders screen milne tak retry karte raho
+        // Tap Account tab — only search in bottom 25% of screen (nav bar area)
+        val tapped = tapBottomNavAccount(root)
+        Log.d(TAG, "navigateToOrders: account tab tap=$tapped")
         scheduleOrdersClick(attempt = 0)
     }
 
+    // Tap Account tab by finding "account"/"me" node only in the bottom navigation area
+    private fun tapBottomNavAccount(root: AccessibilityNodeInfo): Boolean {
+        val minY = (resources.displayMetrics.heightPixels * 0.75f).toInt()
+        return gestureClickInArea(root, listOf("account", "profile", "me", "akun", "my account"), minY = minY)
+    }
+
+    // gestureClick with y-position filter — only tap nodes at or below minY
+    private fun gestureClickInArea(node: AccessibilityNodeInfo, keywords: List<String>, minY: Int): Boolean {
+        val text = node.text?.toString()?.lowercase() ?: ""
+        val desc = node.contentDescription?.toString()?.lowercase() ?: ""
+        if (keywords.any { text.contains(it) || desc.contains(it) }) {
+            var target: AccessibilityNodeInfo? = node
+            repeat(5) {
+                val b = Rect()
+                target?.getBoundsInScreen(b)
+                if (b.width() > 0 && b.height() > 0 && b.centerY() >= minY) {
+                    gestureTap(b.centerX().toFloat(), b.centerY().toFloat())
+                    Log.d(TAG, "gestureClickInArea: tapped (${b.centerX()},${b.centerY()}) text='$text' minY=$minY")
+                    return true
+                }
+                target = target?.parent
+            }
+        }
+        for (i in 0 until node.childCount) {
+            if (gestureClickInArea(node.getChild(i) ?: continue, keywords, minY)) return true
+        }
+        return false
+    }
+
     private fun scheduleOrdersClick(attempt: Int) {
-        if (!isScanMode || attempt >= 6) {
+        if (!isScanMode || attempt >= 10) {
             Log.d(TAG, "scheduleOrdersClick: giving up after $attempt attempts")
             return
         }
@@ -325,18 +353,44 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             if (!isScanMode) return@postDelayed
             val r = rootInActiveWindow ?: run { scheduleOrdersClick(attempt + 1); return@postDelayed }
             val allText = extractAllText(r)
+
+            // Already on Orders screen?
             val onOrdersScreen = allText.contains("past orders", ignoreCase = true) ||
                     allText.contains("order history", ignoreCase = true) ||
                     (allText.contains("delivered on", ignoreCase = true) && allText.contains("Rs.", ignoreCase = true))
             if (onOrdersScreen) {
-                Log.d(TAG, "scheduleOrdersClick: on orders screen after $attempt attempts ✓")
+                Log.d(TAG, "scheduleOrdersClick: on orders screen ✓ (attempt $attempt)")
                 return@postDelayed
             }
-            // Try gesture tap first, fallback to accessibility click
-            val tapped = gestureClickNode(r, listOf("orders", "my orders", "order history"))
-                    || findAndClickNode(r, listOf("orders", "my orders", "order history"))
-            Log.d(TAG, "scheduleOrdersClick: attempt=$attempt tapped=$tapped")
-            scheduleOrdersClick(attempt + 1)
+
+            Log.d(TAG, "scheduleOrdersClick: attempt=$attempt screen='${allText.take(150)}'")
+
+            // Home page check first (takes priority)
+            val onHomePage = allText.contains("pandamart", ignoreCase = true) ||
+                    allText.contains("homechefs", ignoreCase = true) ||
+                    allText.contains("pick-up", ignoreCase = true) ||
+                    allText.contains("new restaurants", ignoreCase = true)
+
+            // Account page — FoodPanda shows Favourites, Wallet, pandapro on profile page
+            val onAccountPage = !onHomePage && (
+                    allText.contains("favourites", ignoreCase = true) ||
+                    allText.contains("wallet", ignoreCase = true) ||
+                    allText.contains("pandapro", ignoreCase = true) ||
+                    allText.contains("log out", ignoreCase = true) ||
+                    allText.contains("view profile", ignoreCase = true))
+
+            if (onAccountPage) {
+                // On Account page — tap Orders item
+                val tapped = gestureClickNode(r, listOf("orders", "my orders", "order history"))
+                        || findAndClickNode(r, listOf("orders", "my orders", "order history"))
+                Log.d(TAG, "scheduleOrdersClick: Account page → Orders tap=$tapped")
+                if (!tapped) scheduleOrdersClick(attempt + 1)
+            } else {
+                // Home/other — tap Account tab (bottom nav only)
+                val tapped = tapBottomNavAccount(r)
+                Log.d(TAG, "scheduleOrdersClick: home/other → Account tab tap=$tapped onHome=$onHomePage")
+                scheduleOrdersClick(attempt + 1)
+            }
         }, delay)
     }
 
@@ -345,21 +399,42 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         val text = node.text?.toString()?.lowercase() ?: ""
         val desc = node.contentDescription?.toString()?.lowercase() ?: ""
         if (keywords.any { text.contains(it) || desc.contains(it) }) {
-            val bounds = Rect()
-            node.getBoundsInScreen(bounds)
-            if (bounds.width() > 0 && bounds.height() > 0) {
-                val path = Path().apply { moveTo(bounds.centerX().toFloat(), bounds.centerY().toFloat()) }
-                val stroke = GestureDescription.StrokeDescription(path, 0, 100)
-                val gesture = GestureDescription.Builder().addStroke(stroke).build()
-                dispatchGesture(gesture, null, null)
-                Log.d(TAG, "gestureClick: tapped at (${bounds.centerX()}, ${bounds.centerY()}) text='$text'")
-                return true
+            // Try this node's bounds, then walk up parents if 0x0
+            var target: AccessibilityNodeInfo? = node
+            repeat(5) {
+                val b = Rect()
+                target?.getBoundsInScreen(b)
+                if (b.width() > 0 && b.height() > 0) {
+                    gestureTap(b.centerX().toFloat(), b.centerY().toFloat())
+                    Log.d(TAG, "gestureClick: tapped (${b.centerX()},${b.centerY()}) text='$text'")
+                    return true
+                }
+                target = target?.parent
             }
+            Log.d(TAG, "gestureClick: found '$text' but all bounds=0x0")
         }
         for (i in 0 until node.childCount) {
             if (gestureClickNode(node.getChild(i) ?: continue, keywords)) return true
         }
         return false
+    }
+
+    private fun gestureTap(x: Float, y: Float) {
+        val path = Path().apply { moveTo(x, y) }
+        val stroke = GestureDescription.StrokeDescription(path, 0, 100)
+        dispatchGesture(GestureDescription.Builder().addStroke(stroke).build(), null, null)
+    }
+
+    private fun gestureSwipeUp() {
+        val m = resources.displayMetrics
+        val cx = m.widthPixels / 2f
+        val path = Path().apply {
+            moveTo(cx, m.heightPixels * 0.75f)
+            lineTo(cx, m.heightPixels * 0.25f)
+        }
+        val stroke = GestureDescription.StrokeDescription(path, 0, 350)
+        dispatchGesture(GestureDescription.Builder().addStroke(stroke).build(), null, null)
+        Log.d(TAG, "gestureSwipeUp performed")
     }
 
     // Scan khatam hone ke baad Home tab pe wapas jao
@@ -547,14 +622,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     }
 
     private fun performAutoScroll(root: AccessibilityNodeInfo) {
-        for (i in 0 until root.childCount) {
-            val child = root.getChild(i) ?: continue
-            if (child.isScrollable) {
-                child.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
-                return
-            }
-            performAutoScroll(child)
-        }
+        gestureSwipeUp()
     }
 
     // ─── Scan Marquee Banner ──────────────────────────────────────────

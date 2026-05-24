@@ -474,6 +474,8 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                     cal.set(Calendar.MONTH, month); cal.set(Calendar.DAY_OF_MONTH, day); cal.set(Calendar.HOUR_OF_DAY, 12)
                 }
             }
+            // Zero out sub-hour fields so same date always gives same key
+            cal.set(Calendar.MINUTE, 0); cal.set(Calendar.SECOND, 0); cal.set(Calendar.MILLISECOND, 0)
             Pair(m.range.first, cal.timeInMillis)
         }.toList()
 

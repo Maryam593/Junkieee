@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" width="180" />
+</div>
+
 # Junkieee 🛡️
 
 your personal foodpanda bodyguard. set a budget, forget about it — junkieee handles the rest silently.

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Junkie</string>
+    <string name="accessibility_service_label">Junkie Budget Monitor</string>
+    <string name="accessibility_description">FoodPanda ke orders automatically track karta hai aur budget khatam hone par app block karta hai</string>
+</resources>

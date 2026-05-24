@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Junkie"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="#E53935"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FoodPanda budget controller"
+            android:textSize="13sp"
+            android:textColor="#9E9E9E"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Budget Summary Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvBudget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Monthly Budget: Rs. 0"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#212121"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEEEEE"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:id="@+id/tvSpent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kharch hua: Rs. 0"
+                android:textSize="15sp"
+                android:textColor="#E53935"/>
+
+            <TextView
+                android:id="@+id/tvRemaining"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bacha hai: Rs. 0"
+                android:textSize="15sp"
+                android:textColor="#43A047"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvPeriod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Period: Set nahi hua (neeche set karo)"
+                android:textSize="13sp"
+                android:textColor="#9E9E9E"
+                android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
+
+        <!-- Budget Period Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Budget Period Set Karo"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kon si dates tak track hoga? (date pe click karo)"
+                android:textSize="12sp"
+                android:textColor="#9E9E9E"
+                android:layout_marginBottom="14dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="Shuru:"
+                    android:textSize="14sp"
+                    android:textColor="#424242"/>
+
+                <TextView
+                    android:id="@+id/tvStartDate"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Date chunein"
+                    android:textSize="14sp"
+                    android:textColor="#1565C0"
+                    android:background="@drawable/input_background"
+                    android:padding="10dp"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="Khatam:"
+                    android:textSize="14sp"
+                    android:textColor="#424242"/>
+
+                <TextView
+                    android:id="@+id/tvEndDate"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Date chunein"
+                    android:textSize="14sp"
+                    android:textColor="#1565C0"
+                    android:background="@drawable/input_background"
+                    android:padding="10dp"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSavePeriod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Period Save Karo"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#7B1FA2"
+                android:padding="14dp"/>
+
+        </LinearLayout>
+
+        <!-- Budget Input Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Monthly Budget Set Karo"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="12dp"/>
+
+            <EditText
+                android:id="@+id/etBudget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Maslan: 5000"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:textSize="16sp"
+                android:background="@drawable/input_background"
+                android:layout_marginBottom="14dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveBudget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Budget Save Karo"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#E53935"
+                android:padding="14dp"/>
+
+        </LinearLayout>
+
+        <!-- Manual Spent Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Is Period Ka Kharch Set Karo"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FoodPanda history se selected period ka total dekh ke yahan enter karo"
+                android:textSize="12sp"
+                android:textColor="#9E9E9E"
+                android:layout_marginBottom="12dp"/>
+
+            <EditText
+                android:id="@+id/etManualSpent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Maslan: 3500"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:textSize="16sp"
+                android:background="@drawable/input_background"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSetSpent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kharch Save Karo"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#F57C00"
+                android:padding="14dp"/>
+
+        </LinearLayout>
+
+        <!-- Auto Scan Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Is Period Ke Orders Auto Scan"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Scan dabao → FoodPanda mein My Orders pe jao → app khud count karega"
+                android:textSize="12sp"
+                android:textColor="#9E9E9E"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Scan Karo Is Period Ke Orders"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1565C0"
+                android:padding="14dp"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFinishScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Scan Khatam — Budget Update Karo"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#2E7D32"
+                android:padding="14dp"/>
+
+        </LinearLayout>
+
+        <!-- Service Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Service: OFF - Enable karo"
+                android:textSize="15sp"
+                android:textColor="#E53935"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEnableService"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FoodGuard Enable Karo"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#212121"
+                android:padding="14dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

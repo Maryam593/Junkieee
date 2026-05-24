@@ -1,0 +1,13 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.keystore
+!debug.keystore
+app/build/
+gradle-8.9-bin.zip

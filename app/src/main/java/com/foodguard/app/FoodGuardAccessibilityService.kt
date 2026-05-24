@@ -1,15 +1,19 @@
 package com.foodguard.app
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.GestureDescription
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.graphics.Path
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
@@ -40,6 +44,22 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     private var scanTotal = 0f
     private var noNewItemsCount = 0
     private var navigationAttempted = false
+
+    // Order tracking — capture on click, deduct only when checkout screen disappears
+    private var pendingOrderAmount = 0f
+    private var waitingForConfirmation = false
+    private var lastScanTime = 0L
+
+    // Marquee banner shown during scan
+    private var scanMarqueeView: TextView? = null
+
+    // Scan timeout runnable
+    private val scanTimeoutRunnable = Runnable {
+        if (isScanMode) {
+            Log.d(TAG, "Scan timeout — force finishing")
+            finishScan()
+        }
+    }
 
     // Every 1s: if FoodPanda is no longer active window, hide dot
     private val dotCheckRunnable = object : Runnable {
@@ -135,15 +155,57 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 }
             } else {
                 blockPlaceOrderIfNeeded(root)
-                checkForOrderConfirmation(allText)
+
+                // If user just clicked "Place Order", check if checkout screen is now gone
+                if (waitingForConfirmation && event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+                    val checkoutKeywords = listOf("place order", "pay now", "ادائیگی", "place my order")
+                    val checkoutStillVisible = checkoutKeywords.any { allText.contains(it, ignoreCase = true) }
+                    if (!checkoutStillVisible && pendingOrderAmount > 0f) {
+                        val a = pendingOrderAmount
+                        pendingOrderAmount = 0f
+                        waitingForConfirmation = false
+                        budget.deduct(a)
+                        budget.spendingInitialized = true
+                        Log.d(TAG, "Order confirmed (checkout gone): Rs.$a | remaining=${budget.remaining}")
+                        showBudgetDot()
+                        if (budget.isBudgetOver) {
+                            showOverlay("Rs. ${a.toInt()} ka order!\nBudget KHATAM! 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+                        } else {
+                            showOverlay("Order track!\nRs. ${a.toInt()} deduct\nBacha: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
+                        }
+                    }
+                } else {
+                    checkForOrderConfirmation(allText)
+                }
             }
         }
 
         if (!isScanMode && event.eventType == AccessibilityEvent.TYPE_VIEW_CLICKED) {
             val clickText = event.text?.joinToString(" ")?.lowercase() ?: ""
-            val placeOrderWords = listOf("place order", "confirm", "pay now", "proceed", "checkout", "ادائیگی", "order now")
-            if (placeOrderWords.any { clickText.contains(it) } && budget.isBudgetOver) {
-                showOverlay("BOOM! Budget khatam!\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+            val placeOrderWords = listOf("place order", "confirm", "pay now", "proceed", "checkout", "ادائیگی", "order now", "place my order", "submit order")
+            if (placeOrderWords.any { clickText.contains(it) }) {
+                if (budget.isBudgetOver) {
+                    showOverlay("BOOM! Budget khatam!\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+                } else {
+                    // Capture amount now but DON'T deduct — wait for checkout screen to disappear
+                    val root2 = rootInActiveWindow
+                    if (root2 != null) {
+                        val amount = extractTotalAmount(extractAllText(root2))
+                        if (amount != null && amount > 100f) {
+                            pendingOrderAmount = amount
+                            waitingForConfirmation = true
+                            Log.d(TAG, "Place order clicked: Rs.$amount captured — waiting for confirmation screen")
+                            // Auto-cancel after 45s if no confirmation arrives
+                            handler.postDelayed({
+                                if (waitingForConfirmation) {
+                                    waitingForConfirmation = false
+                                    pendingOrderAmount = 0f
+                                    Log.d(TAG, "Order confirmation timeout — cancelled (user may have gone back)")
+                                }
+                            }, 45000)
+                        }
+                    }
+                }
             }
         }
     }
@@ -209,12 +271,20 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     // ─── Order Confirmation Detection ─────────────────────────────────
 
     private fun checkForOrderConfirmation(allText: String) {
+        // Already handled via order-click detection
+        if (pendingOrderAmount > 0f) return
+
         val isConfirmScreen =
             allText.contains("order confirmed", ignoreCase = true) ||
             allText.contains("order placed", ignoreCase = true) ||
+            allText.contains("order received", ignoreCase = true) ||
             allText.contains("your order is on its way", ignoreCase = true) ||
             allText.contains("order is confirmed", ignoreCase = true) ||
-            allText.contains("آپ کا آرڈر", ignoreCase = true)
+            allText.contains("thank you for your order", ignoreCase = true) ||
+            allText.contains("being prepared", ignoreCase = true) ||
+            allText.contains("order tracking", ignoreCase = true) ||
+            allText.contains("آپ کا آرڈر", ignoreCase = true) ||
+            allText.contains("آرڈر موصول", ignoreCase = true)
 
         if (!isConfirmScreen) return
         val amount = extractTotalAmount(allText) ?: return
@@ -222,12 +292,14 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         lastDetectedAmount = amount
 
         budget.deduct(amount)
+        budget.spendingInitialized = true
         showBudgetDot()
+        Log.d(TAG, "Confirmation screen detected: Rs.$amount deducted")
 
         if (budget.isBudgetOver) {
             showOverlay("Rs. ${amount.toInt()} ka order!\nBudget KHATAM! 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
         } else {
-            showOverlay("Order track!\nRs. ${amount.toInt()} deduct\nBacha: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
+            showOverlay("Order tracked!\nRs. ${amount.toInt()} deduct\nBacha: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
         }
     }
 
@@ -236,21 +308,49 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     // Account tab click karo, phir 2s baad My Orders click karo
     private fun tryNavigateToOrders(root: AccessibilityNodeInfo) {
         navigationAttempted = true
-        // Agar My Orders already visible hai (account page already open) to seedha click karo
-        if (findAndClickNode(root, listOf("my orders", "order history"))) {
-            Log.d(TAG, "navigateToOrders: My Orders found directly, clicked")
+        // Agar Orders screen already open hai
+        if (gestureClickNode(root, listOf("my orders", "orders", "order history"))) {
+            Log.d(TAG, "navigateToOrders: Orders found directly, tapped")
             return
         }
-        // Warna Account/Profile tab click karo
+        // Account tab click karo (bottom nav)
         val wentToAccount = findAndClickNode(root, listOf("account", "profile", "my account", "me", "akun"))
-        Log.d(TAG, "navigateToOrders: account click=$wentToAccount")
+        Log.d(TAG, "navigateToOrders: account tab click=$wentToAccount")
         if (wentToAccount) {
+            // 3s wait — phir Orders item pe gesture tap
             handler.postDelayed({
                 val r = rootInActiveWindow ?: return@postDelayed
-                val found = findAndClickNode(r, listOf("my orders", "order history", "orders"))
-                Log.d(TAG, "navigateToOrders: My Orders click after delay=$found")
-            }, 2000)
+                val found = gestureClickNode(r, listOf("orders", "my orders", "order history"))
+                Log.d(TAG, "navigateToOrders: Orders gesture tap=$found")
+                if (!found) {
+                    // Fallback: accessibility action bhi try karo
+                    val found2 = findAndClickNode(r, listOf("orders", "my orders", "order history"))
+                    Log.d(TAG, "navigateToOrders: Orders accessibility click=$found2")
+                }
+            }, 3000)
         }
+    }
+
+    // Coordinate-based tap — works even when accessibility ACTION_CLICK fails
+    private fun gestureClickNode(node: AccessibilityNodeInfo, keywords: List<String>): Boolean {
+        val text = node.text?.toString()?.lowercase() ?: ""
+        val desc = node.contentDescription?.toString()?.lowercase() ?: ""
+        if (keywords.any { text.contains(it) || desc.contains(it) }) {
+            val bounds = Rect()
+            node.getBoundsInScreen(bounds)
+            if (bounds.width() > 0 && bounds.height() > 0) {
+                val path = Path().apply { moveTo(bounds.centerX().toFloat(), bounds.centerY().toFloat()) }
+                val stroke = GestureDescription.StrokeDescription(path, 0, 100)
+                val gesture = GestureDescription.Builder().addStroke(stroke).build()
+                dispatchGesture(gesture, null, null)
+                Log.d(TAG, "gestureClick: tapped at (${bounds.centerX()}, ${bounds.centerY()}) text='$text'")
+                return true
+            }
+        }
+        for (i in 0 until node.childCount) {
+            if (gestureClickNode(node.getChild(i) ?: continue, keywords)) return true
+        }
+        return false
     }
 
     // Scan khatam hone ke baad Home tab pe wapas jao
@@ -262,9 +362,17 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     private fun findAndClickNode(node: AccessibilityNodeInfo, keywords: List<String>): Boolean {
         val text = node.text?.toString()?.lowercase() ?: ""
         val desc = node.contentDescription?.toString()?.lowercase() ?: ""
-        if (node.isClickable && keywords.any { text.contains(it) || desc.contains(it) }) {
-            node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            return true
+        if (keywords.any { text.contains(it) || desc.contains(it) }) {
+            // Try clicking this node directly (works even if isClickable=false in some impls)
+            if (node.performAction(AccessibilityNodeInfo.ACTION_CLICK)) return true
+            // If not clickable, try walking up to find clickable parent (up to 3 levels)
+            var p = node.parent
+            repeat(3) {
+                if (p != null) {
+                    if (p!!.performAction(AccessibilityNodeInfo.ACTION_CLICK)) return true
+                    p = p?.parent
+                }
+            }
         }
         for (i in 0 until node.childCount) {
             if (findAndClickNode(node.getChild(i) ?: continue, keywords)) return true
@@ -294,8 +402,10 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         scanTotal = 0f
         noNewItemsCount = 0
         navigationAttempted = false
-        showBanner("Orders check ho rahi hain...")
+        showScanMarquee()
         handler.post { scrollRunnable.run() }
+        // 90s timeout — agar navigate nahi hua toh bhi scan band ho
+        handler.postDelayed(scanTimeoutRunnable, 90000)
         val root = rootInActiveWindow
         if (root != null) tryNavigateToOrders(root)
     }
@@ -336,10 +446,16 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             "jul" to 6, "aug" to 7, "sep" to 8, "oct" to 9, "nov" to 10, "dec" to 11
         )
         val mp = months.keys.joinToString("|") { it.replaceFirstChar { c -> c.uppercaseChar() } }
-        val dateRegex = Regex("""(\d{1,2})\s+($mp)|($mp)\s+(\d{1,2})|(Today|Yesterday)""", RegexOption.IGNORE_CASE)
-        val amountRegex = Regex("""(?:Rs\.?|PKR)\s*([\d,]+)""")
 
-        val datePosns: List<Pair<Int, Long>> = dateRegex.findAll(allText).mapNotNull { m ->
+        // Only match "Delivered on DD MMM" or "Delivered on Today/Yesterday" — ignore all other dates
+        val deliveredRegex = Regex(
+            """Delivered on (?:(\d{1,2})\s+($mp)|($mp)\s+(\d{1,2})|(Today|Yesterday))""",
+            RegexOption.IGNORE_CASE
+        )
+        val amountRegex = Regex("""(?:Rs\.?|PKR)\s*([\d,]+(?:\.\d+)?)""")
+
+        // Only "Delivered on" dates — positions mapped to timestamps
+        val deliveredDates: List<Pair<Int, Long>> = deliveredRegex.findAll(allText).mapNotNull { m ->
             val cal = Calendar.getInstance()
             when {
                 m.groupValues[5].isNotEmpty() -> {
@@ -367,8 +483,19 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             val amount = m.groupValues[1].replace(",", "").toFloatOrNull() ?: return@mapNotNull null
             if (amount < 100f) return@mapNotNull null
             val pos = m.range.first
-            val closestDate = datePosns.filter { it.first < pos }.maxByOrNull { it.first }
-            val dateMs = closestDate?.second ?: 0L
+
+            // Skip cancelled orders — "Cancelled on" appears within 300 chars after amount
+            val afterAmount = allText.substring(pos, minOf(allText.length, pos + 300))
+            if (afterAmount.contains("Cancelled on", ignoreCase = true)) return@mapNotNull null
+
+            // Closest "Delivered on" date within ±500 chars of the amount
+            val closestDelivered = deliveredDates
+                .filter { it.first in (pos - 500)..(pos + 500) }
+                .minByOrNull { Math.abs(it.first - pos) }
+            val dateMs = closestDelivered?.second ?: 0L
+
+            Log.d(TAG, "  amount=Rs.$amount pos=$pos deliveredDate=$dateMs inPeriod=${if (hasPeriod && dateMs > 0L) dateMs in budget.periodStartDate..budget.periodEndDate else true}")
+
             if (hasPeriod && dateMs > 0L && dateMs !in budget.periodStartDate..budget.periodEndDate) return@mapNotNull null
             Pair(amount, dateMs)
         }.toList()
@@ -380,6 +507,8 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         isAutoScan = false
         noNewItemsCount = 0
         handler.removeCallbacks(scrollRunnable)
+        handler.removeCallbacks(scanTimeoutRunnable)
+        hideScanMarquee()
 
         if (scanTotal > 0f) {
             budget.spentAmount = scanTotal
@@ -414,6 +543,41 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 return
             }
             performAutoScroll(child)
+        }
+    }
+
+    // ─── Scan Marquee Banner ──────────────────────────────────────────
+
+    private fun showScanMarquee() {
+        handler.post {
+            if (scanMarqueeView != null) return@post
+            val tv = TextView(this).apply {
+                text = "      Orders track ho rahi hain... please wait      Orders track ho rahi hain...      "
+                textSize = 13f
+                setTextColor(Color.WHITE)
+                setBackgroundColor(Color.parseColor("#DD1565C0"))
+                setSingleLine(true)
+                ellipsize = TextUtils.TruncateAt.MARQUEE
+                marqueeRepeatLimit = -1
+                isSelected = true
+                setPadding(0, 14, 0, 14)
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val params = WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT
+            ).apply { gravity = Gravity.TOP }
+            try { wm.addView(tv, params); scanMarqueeView = tv } catch (_: Exception) {}
+        }
+    }
+
+    private fun hideScanMarquee() {
+        handler.post {
+            try { scanMarqueeView?.let { wm.removeView(it) } } catch (_: Exception) {}
+            scanMarqueeView = null
         }
     }
 
@@ -486,7 +650,9 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         super.onDestroy()
         handler.removeCallbacks(scrollRunnable)
         handler.removeCallbacks(dotCheckRunnable)
+        handler.removeCallbacks(scanTimeoutRunnable)
         hideBudgetDot()
+        hideScanMarquee()
         try { unregisterReceiver(scanReceiver) } catch (_: Exception) {}
         instance = null
     }

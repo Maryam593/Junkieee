@@ -308,27 +308,36 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     // Account tab click karo, phir 2s baad My Orders click karo
     private fun tryNavigateToOrders(root: AccessibilityNodeInfo) {
         navigationAttempted = true
-        // Agar Orders screen already open hai
-        if (gestureClickNode(root, listOf("my orders", "orders", "order history"))) {
-            Log.d(TAG, "navigateToOrders: Orders found directly, tapped")
-            return
-        }
         // Account tab click karo (bottom nav)
         val wentToAccount = findAndClickNode(root, listOf("account", "profile", "my account", "me", "akun"))
         Log.d(TAG, "navigateToOrders: account tab click=$wentToAccount")
-        if (wentToAccount) {
-            // 3s wait — phir Orders item pe gesture tap
-            handler.postDelayed({
-                val r = rootInActiveWindow ?: return@postDelayed
-                val found = gestureClickNode(r, listOf("orders", "my orders", "order history"))
-                Log.d(TAG, "navigateToOrders: Orders gesture tap=$found")
-                if (!found) {
-                    // Fallback: accessibility action bhi try karo
-                    val found2 = findAndClickNode(r, listOf("orders", "my orders", "order history"))
-                    Log.d(TAG, "navigateToOrders: Orders accessibility click=$found2")
-                }
-            }, 3000)
+        // Phir Orders screen milne tak retry karte raho
+        scheduleOrdersClick(attempt = 0)
+    }
+
+    private fun scheduleOrdersClick(attempt: Int) {
+        if (!isScanMode || attempt >= 6) {
+            Log.d(TAG, "scheduleOrdersClick: giving up after $attempt attempts")
+            return
         }
+        val delay = if (attempt == 0) 3000L else 2000L
+        handler.postDelayed({
+            if (!isScanMode) return@postDelayed
+            val r = rootInActiveWindow ?: run { scheduleOrdersClick(attempt + 1); return@postDelayed }
+            val allText = extractAllText(r)
+            val onOrdersScreen = allText.contains("past orders", ignoreCase = true) ||
+                    allText.contains("order history", ignoreCase = true) ||
+                    (allText.contains("delivered on", ignoreCase = true) && allText.contains("Rs.", ignoreCase = true))
+            if (onOrdersScreen) {
+                Log.d(TAG, "scheduleOrdersClick: on orders screen after $attempt attempts ✓")
+                return@postDelayed
+            }
+            // Try gesture tap first, fallback to accessibility click
+            val tapped = gestureClickNode(r, listOf("orders", "my orders", "order history"))
+                    || findAndClickNode(r, listOf("orders", "my orders", "order history"))
+            Log.d(TAG, "scheduleOrdersClick: attempt=$attempt tapped=$tapped")
+            scheduleOrdersClick(attempt + 1)
+        }, delay)
     }
 
     // Coordinate-based tap — works even when accessibility ACTION_CLICK fails

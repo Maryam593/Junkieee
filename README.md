@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo.png" width="120" />
+  <img src="assets/logo.svg" width="120" />
   <h1>JUNKIE</h1>
   <p>Your silent FoodPanda budget bodyguard.</p>
 </div>

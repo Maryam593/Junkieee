@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="120" height="120">
+  <!-- Dark background -->
+  <rect width="108" height="108" rx="24" fill="#0F0F0F"/>
+
+  <!-- J body (lime) -->
+  <path fill="#C8F135" d="M 26,20 L 76,20 L 76,34 L 62,34 L 62,80 Q 62,94 50,94 Q 34,94 28,80 L 28,66 L 42,66 L 42,80 Q 42,88 50,88 Q 58,88 58,80 L 58,34 L 26,34 Z"/>
+
+  <!-- Left eye white -->
+  <circle cx="40" cy="27" r="5" fill="#FFFFFF"/>
+  <!-- Right eye white -->
+  <circle cx="65" cy="27" r="5" fill="#FFFFFF"/>
+
+  <!-- Left pupil -->
+  <circle cx="41.5" cy="27.5" r="2.5" fill="#0F0F0F"/>
+  <!-- Right pupil -->
+  <circle cx="66.5" cy="27.5" r="2.5" fill="#0F0F0F"/>
+
+  <!-- Left eye highlight -->
+  <circle cx="42.5" cy="25.5" r="1" fill="#FFFFFF"/>
+  <!-- Right eye highlight -->
+  <circle cx="67.5" cy="25.5" r="1" fill="#FFFFFF"/>
+</svg>

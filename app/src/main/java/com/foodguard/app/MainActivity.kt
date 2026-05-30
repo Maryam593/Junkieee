@@ -133,17 +133,17 @@ class MainActivity : AppCompatActivity() {
         val serviceOn = enabledServices.contains("com.foodguard.app", ignoreCase = true)
 
         findViewById<TextView>(R.id.tvBudget).text =
-            "Monthly Budget: Rs. ${budget.monthlyBudget.toInt()}"
+            "Rs. ${budget.monthlyBudget.toInt()}"
         findViewById<TextView>(R.id.tvSpent).text =
-            "Kharch hua: Rs. ${budget.spentAmount.toInt()}"
+            "Rs. ${budget.spentAmount.toInt()}"
         findViewById<TextView>(R.id.tvRemaining).text =
-            "Bacha hai: Rs. ${budget.remaining.toInt()}"
+            "Rs. ${budget.remaining.toInt()}"
 
         val periodText = if (budget.periodStartDate > 0L) {
             val initStatus = if (budget.spendingInitialized) "✓ Ready" else "⚠ Scan pending"
-            "Period: ${budget.periodDisplay}   $initStatus"
+            "${budget.periodDisplay}   $initStatus"
         } else {
-            "Period: Set nahi hua (neeche set karo)"
+            "Period not set — configure below"
         }
         findViewById<TextView>(R.id.tvPeriod).text = periodText
         val periodColor = when {
@@ -154,13 +154,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvPeriod).setTextColor(periodColor)
 
         if (serviceOn) {
-            findViewById<TextView>(R.id.tvStatus).text = "Service: ON - FoodPanda monitor ho raha hai"
-            findViewById<TextView>(R.id.tvStatus).setTextColor(0xFF43A047.toInt())
-            findViewById<MaterialButton>(R.id.btnEnableService).text = "Service Enabled ✓"
+            findViewById<TextView>(R.id.tvStatus).text = "Service: ON — monitoring FoodPanda"
+            findViewById<TextView>(R.id.tvStatus).setTextColor(0xFF32D74B.toInt())
+            findViewById<MaterialButton>(R.id.btnEnableService).text = "ENABLED ✓"
         } else {
-            findViewById<TextView>(R.id.tvStatus).text = "Service: OFF - Neeche button dabao!"
-            findViewById<TextView>(R.id.tvStatus).setTextColor(0xFFE53935.toInt())
-            findViewById<MaterialButton>(R.id.btnEnableService).text = "FoodGuard Enable Karo"
+            findViewById<TextView>(R.id.tvStatus).text = "Service: OFF — tap below to enable"
+            findViewById<TextView>(R.id.tvStatus).setTextColor(0xFFFF453A.toInt())
+            findViewById<MaterialButton>(R.id.btnEnableService).text = "ENABLE JUNKIE"
         }
     }
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="?attr/colorCardBackground"
+    android:padding="40dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JUNKIE"
+        android:textSize="52sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorTextPrimary"
+        android:letterSpacing="0.1"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your food budget bestie"
+        android:textSize="14sp"
+        android:textColor="?attr/colorTextSecondary"
+        android:letterSpacing="0.05"
+        android:layout_marginBottom="80dp"/>
+
+    <TextView
+        android:id="@+id/tvSplashJoke"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="17sp"
+        android:textColor="?attr/colorPrimary"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.4"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(just a heads up before you open FoodPanda)"
+        android:textSize="12sp"
+        android:textColor="?attr/colorTextSecondary"
+        android:gravity="center"/>
+
+</LinearLayout>

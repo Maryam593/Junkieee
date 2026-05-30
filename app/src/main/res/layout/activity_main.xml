@@ -1,324 +1,394 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?android:colorBackground"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="32dp">
 
+        <!-- ── Header ─────────────────────────────────────────────── -->
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Junkie"
-            android:textSize="30sp"
+            android:text="JUNKIE"
+            android:textSize="36sp"
             android:textStyle="bold"
-            android:textColor="#E53935"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
+            android:textColor="?attr/colorTextPrimary"
+            android:letterSpacing="0.08"
             android:layout_marginBottom="4dp"/>
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="FoodPanda budget controller"
+            android:text="Your food budget bestie"
             android:textSize="13sp"
-            android:textColor="#9E9E9E"
-            android:gravity="center"
-            android:layout_marginBottom="24dp"/>
+            android:textColor="?attr/colorTextSecondary"
+            android:layout_marginBottom="28dp"/>
 
-        <!-- Budget Summary Card -->
-        <LinearLayout
+        <!-- ── Budget Overview ────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp"
             android:layout_marginBottom="16dp">
-
-            <TextView
-                android:id="@+id/tvBudget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Monthly Budget: Rs. 0"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="#212121"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"/>
-
-            <TextView
-                android:id="@+id/tvSpent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Kharch hua: Rs. 0"
-                android:textSize="15sp"
-                android:textColor="#E53935"/>
-
-            <TextView
-                android:id="@+id/tvRemaining"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Bacha hai: Rs. 0"
-                android:textSize="15sp"
-                android:textColor="#43A047"
-                android:layout_marginTop="6dp"/>
-
-            <TextView
-                android:id="@+id/tvPeriod"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Period: Set nahi hua (neeche set karo)"
-                android:textSize="13sp"
-                android:textColor="#9E9E9E"
-                android:layout_marginTop="8dp"/>
-
-        </LinearLayout>
-
-        <!-- Budget Period Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Budget Period Set Karo"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:layout_marginBottom="4dp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Kon si dates tak track hoga? (date pe click karo)"
-                android:textSize="12sp"
-                android:textColor="#9E9E9E"
-                android:layout_marginBottom="14dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Shuru:"
-                    android:textSize="14sp"
-                    android:textColor="#424242"/>
+                    android:text="BUDGET OVERVIEW"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="10dp"/>
 
                 <TextView
-                    android:id="@+id/tvStartDate"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:id="@+id/tvBudget"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Date chunein"
-                    android:textSize="14sp"
-                    android:textColor="#1565C0"
-                    android:background="@drawable/input_background"
-                    android:padding="10dp"
-                    android:gravity="center"/>
+                    android:text="Rs. 0"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary"
+                    android:layout_marginBottom="16dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?attr/colorDivider"
+                    android:layout_marginBottom="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="SPENT"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorTextSecondary"
+                            android:letterSpacing="0.1"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:id="@+id/tvSpent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rs. 0"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorDanger"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="LEFT"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorTextSecondary"
+                            android:letterSpacing="0.1"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:id="@+id/tvRemaining"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rs. 0"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorSuccess"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvPeriod"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Period: Not set (set below)"
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorTextSecondary"/>
 
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Budget Period ──────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Khatam:"
-                    android:textSize="14sp"
-                    android:textColor="#424242"/>
+                    android:text="BUDGET PERIOD"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="4dp"/>
 
                 <TextView
-                    android:id="@+id/tvEndDate"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Date chunein"
-                    android:textSize="14sp"
-                    android:textColor="#1565C0"
-                    android:background="@drawable/input_background"
-                    android:padding="10dp"
-                    android:gravity="center"/>
+                    android:text="Which dates to track? Tap to pick."
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:layout_marginBottom="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:layout_width="56dp"
+                        android:layout_height="wrap_content"
+                        android:text="From"
+                        android:textSize="13sp"
+                        android:textColor="?attr/colorTextSecondary"/>
+
+                    <TextView
+                        android:id="@+id/tvStartDate"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Pick date"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:background="@drawable/input_background"
+                        android:padding="12dp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="56dp"
+                        android:layout_height="wrap_content"
+                        android:text="To"
+                        android:textSize="13sp"
+                        android:textColor="?attr/colorTextSecondary"/>
+
+                    <TextView
+                        android:id="@+id/tvEndDate"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Pick date"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:background="@drawable/input_background"
+                        android:padding="12dp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSavePeriod"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SAVE PERIOD"/>
 
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSavePeriod"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Period Save Karo"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#7B1FA2"
-                android:padding="14dp"/>
-
-        </LinearLayout>
-
-        <!-- Budget Input Card -->
-        <LinearLayout
+        <!-- ── Monthly Budget ─────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp"
             android:layout_marginBottom="16dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Monthly Budget Set Karo"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:layout_marginBottom="12dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <EditText
-                android:id="@+id/etBudget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Maslan: 5000"
-                android:inputType="numberDecimal"
-                android:padding="12dp"
-                android:textSize="16sp"
-                android:background="@drawable/input_background"
-                android:layout_marginBottom="14dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MONTHLY BUDGET"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="16dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSaveBudget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Budget Save Karo"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#E53935"
-                android:padding="14dp"/>
+                <EditText
+                    android:id="@+id/etBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="e.g. 5000"
+                    android:inputType="numberDecimal"
+                    android:layout_marginBottom="16dp"/>
 
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSaveBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SAVE BUDGET"/>
 
-        <!-- Scan Card -->
-        <LinearLayout
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Scan ───────────────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp"
             android:layout_marginBottom="16dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Is Period Ke Orders Scan Karo"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:layout_marginBottom="4dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="FoodPanda kholo — app khud orders count karega aur band ho jaega"
-                android:textSize="12sp"
-                android:textColor="#9E9E9E"
-                android:layout_marginBottom="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ORDER SCAN"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="4dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStartScan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Scan Karo"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#1565C0"
-                android:padding="14dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Open FoodPanda after tapping — Junkie scans and closes by itself."
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:layout_marginBottom="16dp"/>
 
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStartScan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SCAN NOW"/>
 
-        <!-- Service Card -->
-        <LinearLayout
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Service ────────────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp"
             android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/tvStatus"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Service: OFF - Enable karo"
-                android:textSize="15sp"
-                android:textColor="#E53935"
-                android:layout_marginBottom="12dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEnableService"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="FoodGuard Enable Karo"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#212121"
-                android:padding="14dp"/>
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Service: OFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorDanger"
+                    android:layout_marginBottom="14dp"/>
 
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEnableService"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ENABLE JUNKIE"
+                    style="@style/Widget.Junkie.Button.Outlined"/>
 
-        <!-- Reset Card -->
-        <LinearLayout
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Reset ──────────────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp"
-            android:layout_marginBottom="20dp">
+            android:layout_height="wrap_content">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Data Reset Karo"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:layout_marginBottom="4dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sab kuch clear — budget, period, kharch. Fresh start."
-                android:textSize="12sp"
-                android:textColor="#9E9E9E"
-                android:layout_marginBottom="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RESET DATA"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="4dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnResetAll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sab Reset Karo"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#B71C1C"
-                android:padding="14dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clears everything — budget, period, spending. Fresh start."
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:layout_marginBottom="16dp"/>
 
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResetAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="RESET ALL"
+                    style="@style/Widget.Junkie.Button.Danger"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
-
 </ScrollView>

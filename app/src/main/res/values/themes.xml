@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        HOW TO ADD A NEW THEME
+        ──────────────────────
+        1. Add your raw colors to colors.xml (e.g. mytheme_primary, mytheme_surface …)
+        2. Copy the style block below, rename it "Theme.Junkie.MyTheme"
+        3. Map your color tokens to the attrs
+        4. In AndroidManifest.xml set android:theme="@style/Theme.Junkie.MyTheme"
+    -->
+
+    <!-- ── Junkie Dark (active) ─────────────────────────────────────── -->
+    <style name="Theme.Junkie" parent="Theme.MaterialComponents.NoActionBar">
+
+        <!-- Material color roles -->
+        <item name="colorPrimary">          @color/junkie_primary</item>
+        <item name="colorPrimaryVariant">   @color/junkie_primary</item>
+        <item name="colorSecondary">        @color/junkie_warning</item>
+        <item name="colorSecondaryVariant"> @color/junkie_warning</item>
+        <item name="android:colorBackground">@color/junkie_background</item>
+        <item name="colorSurface">          @color/junkie_surface</item>
+        <item name="colorOnPrimary">        @color/junkie_on_primary</item>
+        <item name="colorOnBackground">     @color/junkie_text_primary</item>
+        <item name="colorOnSurface">        @color/junkie_text_primary</item>
+        <item name="colorError">            @color/junkie_danger</item>
+        <item name="android:textColorPrimary">@color/junkie_text_primary</item>
+        <item name="android:textColorSecondary">@color/junkie_text_secondary</item>
+        <item name="android:windowBackground">@color/junkie_background</item>
+
+        <!-- Custom semantic tokens (mapped from attrs.xml) -->
+        <item name="colorSuccess">          @color/junkie_success</item>
+        <item name="colorWarning">          @color/junkie_warning</item>
+        <item name="colorDanger">           @color/junkie_danger</item>
+        <item name="colorInfo">             @color/junkie_info</item>
+        <item name="colorCardBackground">   @color/junkie_surface</item>
+        <item name="colorCardBorder">       @color/junkie_divider</item>
+        <item name="colorInputBackground">  @color/junkie_surface_high</item>
+        <item name="colorTextPrimary">      @color/junkie_text_primary</item>
+        <item name="colorTextSecondary">    @color/junkie_text_secondary</item>
+        <item name="colorDivider">          @color/junkie_divider</item>
+
+        <!-- MaterialCardView defaults -->
+        <item name="materialCardViewStyle"> @style/Widget.Junkie.CardView</item>
+
+        <!-- MaterialButton defaults -->
+        <item name="materialButtonStyle">   @style/Widget.Junkie.Button</item>
+
+        <!-- EditText -->
+        <item name="editTextStyle">         @style/Widget.Junkie.EditText</item>
+
+    </style>
+
+    <!-- Card style -->
+    <style name="Widget.Junkie.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">   ?attr/colorCardBackground</item>
+        <item name="cardCornerRadius">      16dp</item>
+        <item name="cardElevation">         0dp</item>
+        <item name="strokeWidth">           1dp</item>
+        <item name="strokeColor">           ?attr/colorCardBorder</item>
+    </style>
+
+    <!-- Default button — lime, black text, bold -->
+    <style name="Widget.Junkie.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">        ?attr/colorPrimary</item>
+        <item name="android:textColor">     ?attr/colorOnPrimary</item>
+        <item name="android:textStyle">     bold</item>
+        <item name="android:letterSpacing"> 0.05</item>
+        <item name="cornerRadius">          12dp</item>
+        <item name="android:paddingTop">    14dp</item>
+        <item name="android:paddingBottom"> 14dp</item>
+    </style>
+
+    <!-- Danger button variant — red, white text -->
+    <style name="Widget.Junkie.Button.Danger">
+        <item name="backgroundTint">        ?attr/colorDanger</item>
+        <item name="android:textColor">     @color/junkie_text_primary</item>
+    </style>
+
+    <!-- Outlined button variant — lime outline, lime text -->
+    <style name="Widget.Junkie.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">           ?attr/colorPrimary</item>
+        <item name="android:textColor">     ?attr/colorPrimary</item>
+        <item name="android:textStyle">     bold</item>
+        <item name="cornerRadius">          12dp</item>
+        <item name="android:paddingTop">    14dp</item>
+        <item name="android:paddingBottom"> 14dp</item>
+    </style>
+
+    <!-- EditText -->
+    <style name="Widget.Junkie.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">     ?attr/colorTextPrimary</item>
+        <item name="android:textColorHint"> ?attr/colorTextSecondary</item>
+        <item name="android:background">    @drawable/input_background</item>
+        <item name="android:padding">       14dp</item>
+        <item name="android:textSize">      15sp</item>
+    </style>
+
+</resources>

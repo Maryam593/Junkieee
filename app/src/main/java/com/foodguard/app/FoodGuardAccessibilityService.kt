@@ -21,6 +21,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import java.util.*
 
 private const val TAG = "JUNKIE"
@@ -134,7 +135,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         }
 
         if (!isScanMode && budget.isBudgetOver) {
-            showOverlay(BudgetManager.DADDY_JOKES.random(), Color.parseColor("#C62828"), true)
+            showOverlay(BudgetManager.DADDY_JOKES.random(), R.color.overlay_danger, R.color.overlay_border_danger, true)
             return
         }
 
@@ -169,9 +170,9 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                         Log.d(TAG, "Order confirmed (checkout gone): Rs.$a | remaining=${budget.remaining}")
                         showBudgetDot()
                         if (budget.isBudgetOver) {
-                            showOverlay("Rs. ${a.toInt()} order placed!\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+                            showOverlay("Rs. ${a.toInt()} order placed!\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}", R.color.overlay_danger, R.color.overlay_border_danger, true)
                         } else {
-                            showOverlay("Order tracked!\n- Rs. ${a.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
+                            showOverlay("Order tracked!\n− Rs. ${a.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}", R.color.overlay_success, R.color.overlay_border_success, false)
                         }
                     }
                 } else {
@@ -185,7 +186,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             val placeOrderWords = listOf("place order", "confirm", "pay now", "proceed", "checkout", "ادائیگی", "order now", "place my order", "submit order")
             if (placeOrderWords.any { clickText.contains(it) }) {
                 if (budget.isBudgetOver) {
-                    showOverlay("Budget's GONE!\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+                    showOverlay("Budget's GONE!\n${BudgetManager.DADDY_JOKES.random()}", R.color.overlay_danger, R.color.overlay_border_danger, true)
                 } else {
                     // Capture amount now but DON'T deduct — wait for checkout screen to disappear
                     val root2 = rootInActiveWindow
@@ -213,18 +214,19 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     // ─── Floating Budget Dot ───────────────────────────────────────────
 
     private fun showBudgetDot() {
-        val color = when {
-            budget.isBudgetOver -> Color.parseColor("#F44336")
-            budget.remaining < budget.monthlyBudget * 0.2f -> Color.parseColor("#FFC107")
-            else -> Color.parseColor("#4CAF50")
+        val colorRes = when {
+            budget.isBudgetOver -> R.color.junkie_danger
+            budget.remaining < budget.monthlyBudget * 0.2f -> R.color.junkie_warning
+            else -> R.color.junkie_primary
         }
+        val color = ContextCompat.getColor(this, colorRes)
         handler.post {
             if (dotView == null) {
                 val dot = android.view.View(this)
-                val circle = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color); setStroke(3, Color.WHITE) }
+                val circle = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color); setStroke(3, Color.parseColor("#1A1A1A")) }
                 dot.background = circle
                 val params = WindowManager.LayoutParams(
-                    32, 32,
+                    36, 36,
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -233,7 +235,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 ).apply { gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL; x = 0; y = 80 }
                 try { wm.addView(dot, params); dotView = dot } catch (_: Exception) {}
             } else {
-                val circle = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color); setStroke(3, Color.WHITE) }
+                val circle = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color); setStroke(3, Color.parseColor("#1A1A1A")) }
                 dotView?.background = circle
             }
         }
@@ -253,7 +255,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         val keywords = listOf("place order", "confirm order", "pay now", "proceed to pay",
             "checkout", "ادائیگی", "order now", "pay", "confirm", "submit", "proceed")
         if (findButtonByText(root, keywords)) {
-            showOverlay("Budget's done!\nNo more orders today 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), false)
+            showOverlay("Budget's done!\nNo more orders today 🔒\n${BudgetManager.DADDY_JOKES.random()}", R.color.overlay_danger, R.color.overlay_border_danger, false)
             handler.postDelayed({ performGlobalAction(GLOBAL_ACTION_BACK) }, 500)
         }
     }
@@ -297,9 +299,9 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Confirmation screen detected: Rs.$amount deducted")
 
         if (budget.isBudgetOver) {
-            showOverlay("Rs. ${amount.toInt()} order!\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+            showOverlay("Rs. ${amount.toInt()} order!\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}", R.color.overlay_danger, R.color.overlay_border_danger, true)
         } else {
-            showOverlay("Order tracked!\n- Rs. ${amount.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
+            showOverlay("Order tracked!\n− Rs. ${amount.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}", R.color.overlay_success, R.color.overlay_border_success, false)
         }
     }
 
@@ -477,7 +479,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         noNewItemsCount = 0
         navigationAttempted = false
         handler.post { scrollRunnable.run() }
-        showOverlay("Scan started!\nOpen FoodPanda — I'll handle the rest.", Color.parseColor("#1565C0"), false)
+        showOverlay("Scan started!\nOpen FoodPanda — I'll handle the rest.", R.color.overlay_info, R.color.overlay_border_info, false)
     }
 
     private fun startAutoScan() {
@@ -604,7 +606,8 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             showOverlay(
                 if (isOver) "Scan done! Rs. ${scanTotal.toInt()}\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}"
                 else "Scan complete!\nThis period: Rs. ${scanTotal.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}",
-                if (isOver) Color.parseColor("#C62828") else Color.parseColor("#2E7D32"),
+                if (isOver) R.color.overlay_danger else R.color.overlay_success,
+                if (isOver) R.color.overlay_border_danger else R.color.overlay_border_success,
                 isOver
             )
             // Scan ho gaya — wapas Home pe jao
@@ -615,7 +618,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 }, 2000)
             }
         } else {
-            showOverlay("No orders found in this period.", Color.parseColor("#F57C00"), false)
+            showOverlay("No orders found in this period.", R.color.overlay_warning, R.color.overlay_border_warning, false)
         }
         seenOrderKeys.clear()
         scanTotal = 0f
@@ -626,16 +629,19 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     private fun showScanMarquee() {
         handler.post {
             if (scanMarqueeView != null) return@post
+            val dp = resources.displayMetrics.density
             val tv = TextView(this).apply {
-                text = "      Scanning your orders... please wait      Scanning your orders...      "
-                textSize = 13f
-                setTextColor(Color.WHITE)
-                setBackgroundColor(Color.parseColor("#DD1565C0"))
+                text = "   ◆  Scanning your orders... please wait   ◆  Scanning your orders...   "
+                textSize = 12f
+                setTextColor(ContextCompat.getColor(this@FoodGuardAccessibilityService, R.color.junkie_on_primary))
+                background = GradientDrawable().apply {
+                    setColor(ContextCompat.getColor(this@FoodGuardAccessibilityService, R.color.junkie_primary))
+                }
                 setSingleLine(true)
                 ellipsize = TextUtils.TruncateAt.MARQUEE
                 marqueeRepeatLimit = -1
                 isSelected = true
-                setPadding(0, 14, 0, 14)
+                setPadding(0, (12 * dp).toInt(), 0, (12 * dp).toInt())
                 gravity = Gravity.CENTER_VERTICAL
             }
             val params = WindowManager.LayoutParams(
@@ -660,48 +666,72 @@ class FoodGuardAccessibilityService : AccessibilityService() {
 
     private fun showBanner(msg: String) {
         handler.post {
+            val dp = resources.displayMetrics.density
+            val margin = (16 * dp).toInt()
             val wm2 = getSystemService(WINDOW_SERVICE) as WindowManager
             val layout = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                setBackgroundColor(Color.parseColor("#CC1565C0"))
-                setPadding(30, 15, 30, 15)
+                background = GradientDrawable().apply {
+                    setColor(ContextCompat.getColor(this@FoodGuardAccessibilityService, R.color.overlay_info))
+                    cornerRadius = 12 * dp
+                    setStroke((1.5 * dp).toInt(), ContextCompat.getColor(this@FoodGuardAccessibilityService, R.color.overlay_border_info))
+                }
+                setPadding((16 * dp).toInt(), (10 * dp).toInt(), (16 * dp).toInt(), (10 * dp).toInt())
             }
             layout.addView(TextView(this).apply {
                 text = msg; textSize = 13f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
             })
+            val screenW = resources.displayMetrics.widthPixels
             val params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
+                screenW - margin * 2, WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 PixelFormat.TRANSLUCENT
-            ).apply { gravity = Gravity.BOTTOM }
+            ).apply { gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL; y = (80 * dp).toInt() }
             try { wm2.addView(layout, params) } catch (_: Exception) {}
-            handler.postDelayed({ try { wm2.removeView(layout) } catch (_: Exception) {} }, 1800)
+            handler.postDelayed({ try { wm2.removeView(layout) } catch (_: Exception) {} }, 2500)
         }
     }
 
-    private fun showOverlay(message: String, bgColor: Int, isDecline: Boolean) {
+    private fun showOverlay(message: String, bgColorRes: Int, borderColorRes: Int, isDecline: Boolean) {
         if (overlayShown) return
         overlayShown = true
         handler.post {
+            val dp = resources.displayMetrics.density
+            val margin = (16 * dp).toInt()
+            val screenW = resources.displayMetrics.widthPixels
             val layout = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL; setBackgroundColor(bgColor); setPadding(48, 48, 48, 48)
+                orientation = LinearLayout.VERTICAL
+                background = GradientDrawable().apply {
+                    setColor(ContextCompat.getColor(this@FoodGuardAccessibilityService, bgColorRes))
+                    cornerRadius = 20 * dp
+                    setStroke((1.5 * dp).toInt(), ContextCompat.getColor(this@FoodGuardAccessibilityService, borderColorRes))
+                }
+                setPadding((24 * dp).toInt(), (20 * dp).toInt(), (24 * dp).toInt(), (20 * dp).toInt())
             }
             layout.addView(TextView(this).apply {
-                text = message; textSize = 17f; setTextColor(Color.WHITE); gravity = Gravity.CENTER; setLineSpacing(0f, 1.4f)
+                text = message
+                textSize = 16f
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+                setLineSpacing(0f, 1.5f)
             })
             val params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
+                screenW - margin * 2, WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT
-            ).apply { gravity = Gravity.TOP }
+            ).apply {
+                gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                y = (80 * dp).toInt()
+            }
             try { wm.addView(layout, params) } catch (_: Exception) {}
+            val duration = if (isDecline) 5500L else 4000L
             handler.postDelayed({
                 try { wm.removeView(layout) } catch (_: Exception) {}
                 overlayShown = false
                 if (isDecline) performGlobalAction(GLOBAL_ACTION_HOME)
-            }, if (isDecline) 3500L else 2500L)
+            }, duration)
         }
     }
 

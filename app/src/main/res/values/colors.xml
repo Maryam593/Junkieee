@@ -1,4 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#000000</color>
+
+    <!-- ── Junkie Dark (DoMORE-inspired) ─────────────────────────────── -->
+    <!-- To create a new theme: copy this block, rename the prefix,       -->
+    <!-- and wire it up in themes.xml.                                    -->
+
+    <color name="junkie_background">    #0F0F0F</color>
+    <color name="junkie_surface">       #1A1A1A</color>
+    <color name="junkie_surface_high">  #242424</color>
+
+    <color name="junkie_primary">       #C8F135</color>  <!-- lime -->
+    <color name="junkie_on_primary">    #0F0F0F</color>  <!-- black text on lime -->
+
+    <color name="junkie_success">       #32D74B</color>
+    <color name="junkie_warning">       #FF9F0A</color>
+    <color name="junkie_danger">        #FF453A</color>
+    <color name="junkie_info">          #0A84FF</color>
+
+    <color name="junkie_text_primary">  #FFFFFF</color>
+    <color name="junkie_text_secondary">#7A7A7A</color>
+    <color name="junkie_divider">       #252525</color>
+
+    <!-- Used directly in drawables (attrs not supported there) -->
+    <color name="token_card_bg">        #1A1A1A</color>
+    <color name="token_card_border">    #252525</color>
+    <color name="token_input_bg">       #242424</color>
+    <color name="token_input_border">   #333333</color>
+
+    <!-- Overlay backgrounds (service creates views programmatically) -->
+    <color name="overlay_success">      #1A2E1C</color>
+    <color name="overlay_danger">       #2E0F0F</color>
+    <color name="overlay_info">         #0A1628</color>
+    <color name="overlay_warning">      #2E1E08</color>
+    <color name="overlay_border_success">#32D74B</color>
+    <color name="overlay_border_danger">#FF453A</color>
+    <color name="overlay_border_info">  #0A84FF</color>
+    <color name="overlay_border_warning">#FF9F0A</color>
+
+    <!-- Launcher icon -->
+    <color name="ic_launcher_background">#0F0F0F</color>
+
 </resources>

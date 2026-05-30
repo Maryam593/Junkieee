@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="JUNKIE"
         android:textSize="52sp"
-        android:textStyle="bold"
+        android:fontFamily="@font/righteous"
         android:textColor="?attr/colorTextPrimary"
         android:letterSpacing="0.1"
         android:layout_marginBottom="8dp"/>

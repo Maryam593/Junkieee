@@ -52,6 +52,9 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     private var lastScanTime = 0L
     private var lastSwipeTime = 0L
 
+    // Per-session flags — reset each time FoodPanda comes to foreground
+    private var lowBudgetWarningShown = false
+
     // Marquee banner shown during scan
     private var scanMarqueeView: TextView? = null
 
@@ -70,6 +73,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 val activePkg = rootInActiveWindow?.packageName?.toString() ?: ""
                 if (activePkg != "com.global.foodpanda.android") {
                     foodPandaInForeground = false
+                    lowBudgetWarningShown = false
                     hideBudgetDot()
                 }
             }
@@ -118,17 +122,38 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         if (pkg == "com.global.foodpanda.android") {
             if (!foodPandaInForeground) {
                 foodPandaInForeground = true
+                lowBudgetWarningShown = false
                 Log.d(TAG, "FoodPanda foreground. budget=${budget.monthlyBudget} periodActive=${budget.isPeriodActive} initialized=${budget.spendingInitialized} scanMode=$isScanMode")
-                if (budget.monthlyBudget > 0f && budget.isPeriodActive && !budget.spendingInitialized && !isScanMode) {
-                    Log.d(TAG, "Auto-scan scheduled in 1.5s")
-                    handler.postDelayed({ startAutoScan() }, 1500)
+
+                val periodExpired = budget.periodEndDate > 0L &&
+                        System.currentTimeMillis() > budget.periodEndDate &&
+                        !budget.isPeriodActive
+                val notConfigured = budget.monthlyBudget == 0f || budget.periodStartDate == 0L
+
+                when {
+                    periodExpired -> {
+                        Log.d(TAG, "Period expired")
+                        handler.postDelayed({
+                            showBanner("Budget period ended! Open Junkie to set a new one.")
+                        }, 1200)
+                    }
+                    notConfigured -> {
+                        Log.d(TAG, "Budget not configured")
+                        handler.postDelayed({
+                            showBanner("Open Junkie and set up your budget & period first!")
+                        }, 1200)
+                    }
+                    budget.isPeriodActive && !budget.spendingInitialized && !isScanMode -> {
+                        Log.d(TAG, "Auto-scan scheduled in 1.5s")
+                        handler.postDelayed({ startAutoScan() }, 1500)
+                    }
                 }
             }
             showBudgetDot()
         } else {
-            // Koi aur app foreground mein — dot hatao
             if (foodPandaInForeground) {
                 foodPandaInForeground = false
+                lowBudgetWarningShown = false
                 hideBudgetDot()
             }
             return
@@ -156,6 +181,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 }
             } else {
                 blockPlaceOrderIfNeeded(root)
+                warnIfLowBudget(root)
 
                 // If user just clicked "Place Order", check if checkout screen is now gone
                 if (waitingForConfirmation && event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
@@ -214,9 +240,13 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     // ─── Floating Budget Dot ───────────────────────────────────────────
 
     private fun showBudgetDot() {
+        val periodExpired = budget.periodEndDate > 0L &&
+                System.currentTimeMillis() > budget.periodEndDate && !budget.isPeriodActive
         val colorRes = when {
+            periodExpired -> R.color.junkie_text_secondary
+            budget.monthlyBudget == 0f || budget.periodStartDate == 0L -> R.color.junkie_text_secondary
             budget.isBudgetOver -> R.color.junkie_danger
-            budget.remaining < budget.monthlyBudget * 0.2f -> R.color.junkie_warning
+            budget.remaining < budget.monthlyBudget * 0.20f -> R.color.junkie_warning
             else -> R.color.junkie_primary
         }
         val color = ContextCompat.getColor(this, colorRes)
@@ -257,6 +287,24 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         if (findButtonByText(root, keywords)) {
             showOverlay("Budget's done!\nNo more orders today 🔒\n${BudgetManager.DADDY_JOKES.random()}", R.color.overlay_danger, R.color.overlay_border_danger, false)
             handler.postDelayed({ performGlobalAction(GLOBAL_ACTION_BACK) }, 500)
+        }
+    }
+
+    // ─── Almost-Over Warning ──────────────────────────────────────────
+
+    private fun warnIfLowBudget(root: AccessibilityNodeInfo) {
+        if (lowBudgetWarningShown) return
+        if (!budget.isPeriodActive || !budget.spendingInitialized) return
+        if (budget.isBudgetOver || budget.monthlyBudget == 0f) return
+        if (budget.remaining >= budget.monthlyBudget * 0.20f) return
+
+        val cartKeywords = listOf("place order", "pay now", "checkout", "ادائیگی", "your cart", "add to cart")
+        if (findButtonByText(root, cartKeywords)) {
+            lowBudgetWarningShown = true
+            showOverlay(
+                "⚠ Only Rs. ${budget.remaining.toInt()} left!\nMake it count.",
+                R.color.overlay_warning, R.color.overlay_border_warning, false
+            )
         }
     }
 
@@ -618,7 +666,16 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 }, 2000)
             }
         } else {
-            showOverlay("No orders found in this period.", R.color.overlay_warning, R.color.overlay_border_warning, false)
+            if (budget.isPeriodActive) {
+                budget.spendingInitialized = true
+                showBudgetDot()
+                showOverlay(
+                    "Fresh start!\nNo orders yet this period.\nRs. ${budget.monthlyBudget.toInt()} budget is all yours.",
+                    R.color.overlay_success, R.color.overlay_border_success, false
+                )
+            } else {
+                showOverlay("No orders found in this period.", R.color.overlay_warning, R.color.overlay_border_warning, false)
+            }
         }
         seenOrderKeys.clear()
         scanTotal = 0f

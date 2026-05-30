@@ -133,7 +133,6 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             return
         }
 
-        // Budget over — ghar bhejo
         if (!isScanMode && budget.isBudgetOver) {
             showOverlay(BudgetManager.DADDY_JOKES.random(), Color.parseColor("#C62828"), true)
             return
@@ -170,9 +169,9 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                         Log.d(TAG, "Order confirmed (checkout gone): Rs.$a | remaining=${budget.remaining}")
                         showBudgetDot()
                         if (budget.isBudgetOver) {
-                            showOverlay("Rs. ${a.toInt()} ka order!\nBudget KHATAM! 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+                            showOverlay("Rs. ${a.toInt()} order placed!\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
                         } else {
-                            showOverlay("Order track!\nRs. ${a.toInt()} deduct\nBacha: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
+                            showOverlay("Order tracked!\n- Rs. ${a.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
                         }
                     }
                 } else {
@@ -186,7 +185,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             val placeOrderWords = listOf("place order", "confirm", "pay now", "proceed", "checkout", "ادائیگی", "order now", "place my order", "submit order")
             if (placeOrderWords.any { clickText.contains(it) }) {
                 if (budget.isBudgetOver) {
-                    showOverlay("BOOM! Budget khatam!\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+                    showOverlay("Budget's GONE!\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
                 } else {
                     // Capture amount now but DON'T deduct — wait for checkout screen to disappear
                     val root2 = rootInActiveWindow
@@ -254,7 +253,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         val keywords = listOf("place order", "confirm order", "pay now", "proceed to pay",
             "checkout", "ادائیگی", "order now", "pay", "confirm", "submit", "proceed")
         if (findButtonByText(root, keywords)) {
-            showOverlay("Budget khatam!\nOrder nahi ho sakta 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), false)
+            showOverlay("Budget's done!\nNo more orders today 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), false)
             handler.postDelayed({ performGlobalAction(GLOBAL_ACTION_BACK) }, 500)
         }
     }
@@ -298,9 +297,9 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         Log.d(TAG, "Confirmation screen detected: Rs.$amount deducted")
 
         if (budget.isBudgetOver) {
-            showOverlay("Rs. ${amount.toInt()} ka order!\nBudget KHATAM! 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
+            showOverlay("Rs. ${amount.toInt()} order!\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}", Color.parseColor("#C62828"), true)
         } else {
-            showOverlay("Order tracked!\nRs. ${amount.toInt()} deduct\nBacha: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
+            showOverlay("Order tracked!\n- Rs. ${amount.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}", Color.parseColor("#2E7D32"), false)
         }
     }
 
@@ -478,7 +477,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         noNewItemsCount = 0
         navigationAttempted = false
         handler.post { scrollRunnable.run() }
-        showOverlay("Scan shuru!\nFoodPanda mein My Orders pe jao\nMain khud scan karunga", Color.parseColor("#1565C0"), false)
+        showOverlay("Scan started!\nOpen FoodPanda — I'll handle the rest.", Color.parseColor("#1565C0"), false)
     }
 
     private fun startAutoScan() {
@@ -514,7 +513,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
 
         if (newFound) {
             noNewItemsCount = 0
-            showBanner("Scanning... Rs. ${scanTotal.toInt()} (${seenOrderKeys.size} orders)")
+            showBanner("Scanning... Rs. ${scanTotal.toInt()} · ${seenOrderKeys.size} orders found")
         } else {
             noNewItemsCount++
             Log.d(TAG, "  No new items, count=$noNewItemsCount/6")
@@ -603,8 +602,8 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             showBudgetDot()
             val isOver = budget.isBudgetOver
             showOverlay(
-                if (isOver) "Scan done! Rs. ${scanTotal.toInt()}\nBudget KHATAM! 🔒\n${BudgetManager.DADDY_JOKES.random()}"
-                else "Scan complete!\nIs period: Rs. ${scanTotal.toInt()}\nBacha: Rs. ${budget.remaining.toInt()}",
+                if (isOver) "Scan done! Rs. ${scanTotal.toInt()}\nBudget GONE. 🔒\n${BudgetManager.DADDY_JOKES.random()}"
+                else "Scan complete!\nThis period: Rs. ${scanTotal.toInt()}\nLeft: Rs. ${budget.remaining.toInt()}",
                 if (isOver) Color.parseColor("#C62828") else Color.parseColor("#2E7D32"),
                 isOver
             )
@@ -616,7 +615,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 }, 2000)
             }
         } else {
-            showOverlay("Koi order nahi mila is period mein", Color.parseColor("#F57C00"), false)
+            showOverlay("No orders found in this period.", Color.parseColor("#F57C00"), false)
         }
         seenOrderKeys.clear()
         scanTotal = 0f
@@ -628,7 +627,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
         handler.post {
             if (scanMarqueeView != null) return@post
             val tv = TextView(this).apply {
-                text = "      Orders track ho rahi hain... please wait      Orders track ho rahi hain...      "
+                text = "      Scanning your orders... please wait      Scanning your orders...      "
                 textSize = 13f
                 setTextColor(Color.WHITE)
                 setBackgroundColor(Color.parseColor("#DD1565C0"))

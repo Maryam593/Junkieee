@@ -97,11 +97,11 @@ class BudgetManager(private val context: Context) {
 
     companion object {
         val DADDY_JOKES = listOf(
-            "Budget khatam! Roti aur achar khao — personality banti hai! 😂",
-            "Error 404: Paisa Not Found. Ghar ka khana try karo!",
-            "FoodPanda ne tumhara wallet dekha aur rona shuru kar diya 😭",
-            "Aaj ke liye bas! Mama ke haath ka khana free hota hai!",
-            "Wallet empty, FoodPanda blocked. Sachchi dost yehi karti hai! 🔒"
+            "Budget's DONE. Go eat some cereal, bestie. 😂",
+            "Error 404: Money Not Found. Kitchen is still an option!",
+            "FoodPanda saw your balance and cried. 😭",
+            "That's enough for today! Home food hits different (and it's free).",
+            "Wallet empty, FoodPanda blocked. That's what besties do. 🔒"
         )
     }
 }

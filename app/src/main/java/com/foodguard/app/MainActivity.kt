@@ -5,8 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +15,6 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var budget: BudgetManager
-    private val handler = Handler(Looper.getMainLooper())
     private val sdf = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
 
     private val startCal = Calendar.getInstance()
@@ -30,11 +27,9 @@ class MainActivity : AppCompatActivity() {
 
         requestOverlayPermission()
 
-        // Load saved period dates into local calendars
         if (budget.periodStartDate > 0) startCal.timeInMillis = budget.periodStartDate
         if (budget.periodEndDate > 0) endCal.timeInMillis = budget.periodEndDate
         updateDateDisplays()
-
         updateUI()
 
         // ── Budget Save ──────────────────────────────────────────────────
@@ -50,41 +45,14 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Budget set! Rs. ${amount.toInt()} / period", Toast.LENGTH_LONG).show()
         }
 
-        // ── Manual Spent Save ────────────────────────────────────────────
-        findViewById<MaterialButton>(R.id.btnSetSpent).setOnClickListener {
-            val input = findViewById<EditText>(R.id.etManualSpent).text.toString()
-            val amount = input.toFloatOrNull()
-            if (amount == null || amount < 0) {
-                Toast.makeText(this, "Sahi amount daalo!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            budget.spentAmount = amount
-            budget.spendingInitialized = true
-            findViewById<EditText>(R.id.etManualSpent).text.clear()
-            updateUI()
-            Toast.makeText(this, "Kharch set! Rs. ${amount.toInt()} — ab FoodPanda chalao! ✓", Toast.LENGTH_LONG).show()
-        }
-
-        // ── Scan Start ───────────────────────────────────────────────────
+        // ── Scan ─────────────────────────────────────────────────────────
         findViewById<MaterialButton>(R.id.btnStartScan).setOnClickListener {
-            val service = FoodGuardAccessibilityService.instance
-            if (service == null) {
+            if (FoodGuardAccessibilityService.instance == null) {
                 Toast.makeText(this, "Pehle FoodGuard Service enable karo!", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             sendBroadcast(Intent("com.foodguard.START_SCAN"))
-            Toast.makeText(this, "Ab khud FoodPanda kholo aur My Orders pe jao!", Toast.LENGTH_LONG).show()
-        }
-
-        // ── Scan Finish ──────────────────────────────────────────────────
-        findViewById<MaterialButton>(R.id.btnFinishScan).setOnClickListener {
-            val service = FoodGuardAccessibilityService.instance
-            if (service == null) {
-                Toast.makeText(this, "Service enable karo pehle!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            service.finishScan()
-            handler.postDelayed({ updateUI() }, 1000)
+            Toast.makeText(this, "FoodPanda kholo — app khud scan karega!", Toast.LENGTH_LONG).show()
         }
 
         // ── Service Enable ───────────────────────────────────────────────
@@ -134,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             updateUI()
             Toast.makeText(
                 this,
-                "Period set!\n${sdf.format(startCal.time)} → ${sdf.format(endCal.time)}\nAb pehle is period ka kharch daalo!",
+                "Period set! ${sdf.format(startCal.time)} → ${sdf.format(endCal.time)}\nAb FoodPanda kholo — Junkie baaki kaam karega!",
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -171,9 +139,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvRemaining).text =
             "Bacha hai: Rs. ${budget.remaining.toInt()}"
 
-        // Period + initialization status
         val periodText = if (budget.periodStartDate > 0L) {
-            val initStatus = if (budget.spendingInitialized) "✓ Ready" else "⚠ Kharch set karo!"
+            val initStatus = if (budget.spendingInitialized) "✓ Ready" else "⚠ Scan pending"
             "Period: ${budget.periodDisplay}   $initStatus"
         } else {
             "Period: Set nahi hua (neeche set karo)"

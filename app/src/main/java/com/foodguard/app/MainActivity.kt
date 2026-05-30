@@ -1,7 +1,7 @@
 package com.foodguard.app
 
 import android.app.DatePickerDialog
-import android.content.Intent
+import android.content.Intent  // needed for Settings intents
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -43,16 +43,6 @@ class MainActivity : AppCompatActivity() {
             budget.monthlyBudget = amount
             updateUI()
             Toast.makeText(this, "Budget set! Rs. ${amount.toInt()} / period", Toast.LENGTH_LONG).show()
-        }
-
-        // ── Scan ─────────────────────────────────────────────────────────
-        findViewById<MaterialButton>(R.id.btnStartScan).setOnClickListener {
-            if (FoodGuardAccessibilityService.instance == null) {
-                Toast.makeText(this, "Pehle FoodGuard Service enable karo!", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            sendBroadcast(Intent("com.foodguard.START_SCAN"))
-            Toast.makeText(this, "FoodPanda kholo — app khud scan karega!", Toast.LENGTH_LONG).show()
         }
 
         // ── Service Enable ───────────────────────────────────────────────

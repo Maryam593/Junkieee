@@ -5,8 +5,39 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
+    <!-- J body -->
     <path
         android:fillColor="#C8F135"
-        android:pathData="M 26,20 L 76,20 L 76,20 L 76,34 L 62,34 L 62,80 Q 62,94 50,94 Q 34,94 28,80 L 28,66 L 42,66 L 42,80 Q 42,88 50,88 Q 58,88 58,80 L 58,34 L 26,34 Z"/>
+        android:pathData="M 26,20 L 76,20 L 76,34 L 62,34 L 62,80 Q 62,94 50,94 Q 34,94 28,80 L 28,66 L 42,66 L 42,80 Q 42,88 50,88 Q 58,88 58,80 L 58,34 L 26,34 Z"/>
+
+    <!-- Left eye white -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 35,27 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0"/>
+
+    <!-- Right eye white -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 60,27 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0"/>
+
+    <!-- Left pupil (shifted right — looking sideways) -->
+    <path
+        android:fillColor="#0F0F0F"
+        android:pathData="M 38.5,27.5 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0"/>
+
+    <!-- Right pupil -->
+    <path
+        android:fillColor="#0F0F0F"
+        android:pathData="M 63.5,27.5 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0"/>
+
+    <!-- Left eye highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 40.5,25.5 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0"/>
+
+    <!-- Right eye highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 65.5,25.5 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0"/>
 
 </vector>

@@ -1,64 +1,64 @@
 <div align="center">
   <img src="assets/logo.png" width="120" />
   <h1>JUNKIE</h1>
-  <p>your silent FoodPanda budget bodyguard</p>
+  <p>Your silent FoodPanda budget bodyguard.</p>
 </div>
 
 ---
 
-## what it does
+## What It Does
 
-open FoodPanda, junkie does the rest — no buttons, no effort.
+Open FoodPanda — Junkie handles the rest. No buttons, no manual input.
 
-- **silent auto-scan** — when you open FoodPanda, junkie navigates to your order history on its own and tallies up what you've spent this period
-- **floating dot** — always visible while FoodPanda is open: 🟢 chill · 🟡 slowing down · 🔴 you're done
-- **budget blocking** — tries to place an order when you're over budget? blocked before it goes through
-- **custom date ranges** — not just monthly. set any period you want
-- **3 smart scenarios** — handles fresh periods, almost-over warnings, and expired periods cleanly without conflicting
-- **dark themed overlays** — styled notifications with colored bodies (red 🚨 / blue 😇 / green) that don't look like system toasts
-
----
-
-## how it works
-
-junkie runs as an Android accessibility service. it never connects to the internet, never leaves your phone. 100% local.
-
-```
-1. open junkie → set budget + date range
-2. open FoodPanda like normal
-3. junkie auto-scans your order history silently
-4. dot tells you where you stand in real time
-5. over budget → next order is blocked. done.
-```
+- **Silent auto-scan** — When you open FoodPanda, Junkie navigates to your order history automatically and calculates exactly how much you have spent this period.
+- **Floating dot indicator** — Always visible while FoodPanda is open: green means you are fine, orange means slow down, red means you are over budget.
+- **Order blocking** — If you try to place an order when your budget is exhausted, Junkie blocks it before it goes through.
+- **Custom date ranges** — Set any period you want, not just monthly cycles.
+- **Smart scenario handling** — Handles fresh periods, low-budget warnings, and expired periods cleanly, without triggering conflicting notifications.
+- **Styled overlay notifications** — Dark-themed cards with colored backgrounds instead of plain system toasts. Red warnings get 🚨, info messages get 😇.
 
 ---
 
-## scenarios
+## How It Works
 
-| situation | what junkie does |
+Junkie runs as an Android Accessibility Service entirely on your device. It never connects to the internet, never sends your data anywhere, and never stores anything outside your phone.
+
+```
+1. Open Junkie → set your budget and date range
+2. Open FoodPanda as you normally would
+3. Junkie silently scans your order history in the background
+4. The floating dot tells you your status in real time
+5. Budget blown → your next order is blocked
+```
+
+---
+
+## Scenario Behaviour
+
+| Situation | What Junkie Does |
 |-----------|-----------------|
-| period not configured | blue banner — reminds you to set up |
-| period active, fresh start | auto-scan → "fresh start!" message |
-| period active, almost over (≤20%) | orange warning overlay on checkout |
-| period active, budget blown | red block overlay + order stopped |
-| period expired | blue banner — prompts new period, FoodPanda stays open |
+| Budget and period not configured | Blue banner prompting you to set up |
+| Period active, no orders yet | Auto-scan → "Fresh start!" confirmation |
+| Period active, under 20% budget remaining | Orange warning overlay at checkout |
+| Period active, budget fully spent | Red block overlay, order is stopped |
+| Period expired | Blue banner to set a new period; FoodPanda stays open |
 
 ---
 
-## tech
+## Tech Stack
 
 - Kotlin
 - Android Accessibility Service
-- WindowManager overlay (TYPE_APPLICATION_OVERLAY)
-- GestureDescription for gesture-based navigation
-- SharedPreferences for local storage
+- WindowManager overlay (`TYPE_APPLICATION_OVERLAY`)
+- `GestureDescription` for gesture-based in-app navigation
+- SharedPreferences for fully local storage
 - Righteous font (Google Fonts)
-- Material Design 3 / dark theme with token system
-- Min SDK: Android 8.0 (API 26)
+- Material Design 3 with a custom dark theme token system
+- Minimum SDK: Android 8.0 (API 26)
 
 ---
 
-## run it yourself
+## Run It Yourself
 
 ```bash
 git clone https://github.com/Maryam593/Junkieee.git
@@ -67,10 +67,10 @@ cd Junkieee
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-then: enable the accessibility service in **Settings → Accessibility → Junkie**.
+After installing, go to **Settings → Accessibility → Junkie** and enable the service.
 
 ---
 
-built for people who say "just one more order" and then check their account at the end of the month 💀
+*Built for everyone who says "just one more order" and then checks their bank balance at the end of the month. 💀*
 
-made with ♥ by Maryam
+Made with ♥ by Maryam

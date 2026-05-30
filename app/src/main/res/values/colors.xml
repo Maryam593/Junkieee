@@ -28,10 +28,10 @@
     <color name="token_input_border">   #333333</color>
 
     <!-- Overlay backgrounds (service creates views programmatically) -->
-    <color name="overlay_success">      #1A2E1C</color>
-    <color name="overlay_danger">       #2E0F0F</color>
-    <color name="overlay_info">         #0A1628</color>
-    <color name="overlay_warning">      #2E1E08</color>
+    <color name="overlay_success">      #0C3314</color>
+    <color name="overlay_danger">       #3D0808</color>
+    <color name="overlay_info">         #061C3D</color>
+    <color name="overlay_warning">      #3D1600</color>
     <color name="overlay_border_success">#32D74B</color>
     <color name="overlay_border_danger">#FF453A</color>
     <color name="overlay_border_info">  #0A84FF</color>

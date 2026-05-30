@@ -159,7 +159,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
             return
         }
 
-        if (!isScanMode && budget.isBudgetOver) {
+        if (!isScanMode && budget.isPeriodActive && budget.isBudgetOver) {
             showOverlay(BudgetManager.DADDY_JOKES.random(), R.color.overlay_danger, R.color.overlay_border_danger, true)
             return
         }
@@ -180,7 +180,7 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                     tryNavigateToOrders(root)
                 }
             } else {
-                blockPlaceOrderIfNeeded(root)
+                if (budget.isPeriodActive) blockPlaceOrderIfNeeded(root)
                 warnIfLowBudget(root)
 
                 // If user just clicked "Place Order", check if checkout screen is now gone
@@ -753,6 +753,11 @@ class FoodGuardAccessibilityService : AccessibilityService() {
     private fun showOverlay(message: String, bgColorRes: Int, borderColorRes: Int, isDecline: Boolean) {
         if (overlayShown) return
         overlayShown = true
+        val emojiPrefix = when (bgColorRes) {
+            R.color.overlay_danger -> "🚨\n"
+            R.color.overlay_info   -> "😇\n"
+            else -> ""
+        }
         handler.post {
             val dp = resources.displayMetrics.density
             val margin = (16 * dp).toInt()
@@ -762,12 +767,12 @@ class FoodGuardAccessibilityService : AccessibilityService() {
                 background = GradientDrawable().apply {
                     setColor(ContextCompat.getColor(this@FoodGuardAccessibilityService, bgColorRes))
                     cornerRadius = 20 * dp
-                    setStroke((1.5 * dp).toInt(), ContextCompat.getColor(this@FoodGuardAccessibilityService, borderColorRes))
+                    setStroke((2 * dp).toInt(), ContextCompat.getColor(this@FoodGuardAccessibilityService, borderColorRes))
                 }
                 setPadding((24 * dp).toInt(), (20 * dp).toInt(), (24 * dp).toInt(), (20 * dp).toInt())
             }
             layout.addView(TextView(this).apply {
-                text = message
+                text = "$emojiPrefix$message"
                 textSize = 16f
                 setTextColor(Color.WHITE)
                 gravity = Gravity.CENTER

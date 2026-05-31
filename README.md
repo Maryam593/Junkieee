@@ -5,7 +5,7 @@
 
   <br/>
 
-  <a href="https://github.com/Maryam593/Junkieee/releases/latest">
+  <a href="https://github.com/Maryam593/Junkieee/releases/download/v1.0/Junkie-v1.0.apk">
     <img src="https://img.shields.io/badge/Download%20APK-Latest%20Release-C8F135?style=for-the-badge&logo=android&logoColor=0F0F0F"/>
   </a>
 </div>

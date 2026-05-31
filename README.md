@@ -6,6 +6,18 @@
 
 ---
 
+## Screenshots
+
+<div align="center">
+  <img src="screenshots/splash.jpeg" width="30%" />
+  &nbsp;&nbsp;
+  <img src="screenshots/blocked.jpeg" width="30%" />
+  &nbsp;&nbsp;
+  <img src="screenshots/accessibility.jpeg" width="30%" />
+</div>
+
+---
+
 ## What It Does
 
 Open FoodPanda — Junkie handles the rest. No buttons, no manual input.

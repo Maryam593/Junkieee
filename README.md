@@ -2,6 +2,12 @@
   <img src="assets/logo.svg" width="120" />
   <h1>JUNKIEEE</h1>
   <p>Your silent FoodPanda budget bodyguard.</p>
+
+  <br/>
+
+  <a href="https://github.com/Maryam593/Junkieee/releases/latest">
+    <img src="https://img.shields.io/badge/Download%20APK-Latest%20Release-C8F135?style=for-the-badge&logo=android&logoColor=0F0F0F"/>
+  </a>
 </div>
 
 ---
